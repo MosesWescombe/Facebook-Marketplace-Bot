@@ -1,0 +1,28 @@
+{
+  "name": "facebook-marketplace-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "prettier": ".prettierrc",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MosesWescombe/Facebook-Marketplace-Bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MosesWescombe/Facebook-Marketplace-Bot/issues"
+  },
+  "homepage": "https://github.com/MosesWescombe/Facebook-Marketplace-Bot#readme",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "prettier": "^3.2.5"
+  }
+}
