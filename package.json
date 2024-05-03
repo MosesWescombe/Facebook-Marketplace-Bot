@@ -6,6 +6,7 @@
   "prettier": ".prettierrc",
   "scripts": {
     "build": "tsc",
+    "start": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,9 +21,14 @@
   },
   "homepage": "https://github.com/MosesWescombe/Facebook-Marketplace-Bot#readme",
   "devDependencies": {
+    "@types/node": "^20.12.8",
+    "@types/selenium-webdriver": "^4.1.22",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "selenium-webdriver": "^4.20.0"
   }
 }
