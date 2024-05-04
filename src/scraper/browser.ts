@@ -1,4 +1,4 @@
-import { Builder, By, WebDriver, WebElement } from 'selenium-webdriver';
+import { Builder, By, Capabilities, WebDriver, WebElement } from 'selenium-webdriver';
 
 export type Listing = {
     id: string;
@@ -17,7 +17,12 @@ export class Browser {
     private listings: Listing[] = [];
 
     constructor() {
-        this.driver = new Builder().forBrowser('chrome').build();
+        const chromeCapabilities = Capabilities.chrome();
+        chromeCapabilities.set('chromeOptions', {
+            args: ['--headless', '--disable-gpu', '--window-size=1920x1080']
+        });
+
+        this.driver = new Builder().forBrowser('chrome').withCapabilities(chromeCapabilities).build();
     }
     
     waitForPageToLoad = async () => {
@@ -69,6 +74,15 @@ export class Browser {
             
             await this.driver.get(listing.url);
             await this.waitForPageToLoad();
+
+            // Click read more button
+            const readMoreButton = await this.driver.findElement(By.xpath('//span[text()="See more"]'));
+
+            if (readMoreButton) {
+                await readMoreButton.click();
+                // Wait 1s
+                await this.driver.sleep(1000);
+            }
             
             const titleElement = (await this.driver.getTitle());
             const bodyText = await this.driver.findElement(By.css('body')).getText();
@@ -88,20 +102,20 @@ export class Browser {
             // Get the kms if exists
             const regex = /\b\d{1,3}(?:,\d{3})*\s?(km|kms|ks|k)\b/gi; // 'i' for case insensitive, 'g' for global
             const km_matches = bodyText.match(regex);
-            let kms = km_matches ? km_matches[0].trim() : 'Kms not found';
+            let kms = km_matches ? km_matches[0].trim() : 'Not found';
             if (kms === '64 km') {
                 kms = 'Kms not found'
             }
             
             // Find image
             const images: WebElement[] = await this.driver.findElements(By.css('img[alt^="Product photo of"]'));
-            const img_src: string = await images[0].getAttribute('src') ?? 'Image not found';
+            const img_src: string = await images[0]?.getAttribute('src') ?? 'Image not found';
             
             return {
                 ...listing,
                 title,
                 kms,
-                price: price_matches ? price_matches[0].trim() : 'Price not found',
+                price: price_matches ? price_matches[0].trim() : 'Not found',
                 image: img_src
             };
         } catch (error) {

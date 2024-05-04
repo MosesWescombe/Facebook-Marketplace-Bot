@@ -6,7 +6,9 @@
   "prettier": ".prettierrc",
   "scripts": {
     "build": "tsc",
-    "start": "nodemon",
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon",
+    "update-commands": "node ./src/bot/deploy-commands.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,6 +31,7 @@
   },
   "dependencies": {
     "prettier": "^3.2.5",
-    "selenium-webdriver": "^4.20.0"
+    "selenium-webdriver": "^4.20.0",
+    "discord.js": "^14.14.1"
   }
 }
