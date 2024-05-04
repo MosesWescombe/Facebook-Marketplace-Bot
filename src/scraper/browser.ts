@@ -1,4 +1,5 @@
-import { Builder, By, Capabilities, WebDriver, WebElement } from 'selenium-webdriver';
+import { Builder, By, WebDriver, WebElement } from 'selenium-webdriver';
+import { Options } from 'selenium-webdriver/chrome';
 
 export type Listing = {
     id: string;
@@ -14,15 +15,13 @@ export type DetailedListing = Listing & {
 
 export class Browser {
     private driver: WebDriver;
-    private listings: Listing[] = [];
 
     constructor() {
-        const chromeCapabilities = Capabilities.chrome();
-        chromeCapabilities.set('chromeOptions', {
-            args: ['--headless', '--disable-gpu', '--window-size=1920x1080']
-        });
+        // Headless mode
+        this.driver = new Builder().setChromeOptions(new Options().addArguments('--headless=new')).build();
 
-        this.driver = new Builder().forBrowser('chrome').withCapabilities(chromeCapabilities).build();
+        // Non-headless mode
+        // this.driver = new Builder().forBrowser('chrome').build();
     }
     
     waitForPageToLoad = async () => {
@@ -34,9 +33,9 @@ export class Browser {
         await this.driver.sleep(4000);
     }
     
-    getListings = async (): Promise<Listing[]> => {
+    getListings = async (search: string, existingListings: string[]): Promise<Listing[]> => {
         try {
-            await this.driver.get('https://www.facebook.com/marketplace/christchurch/search?query=vehicle&minPrice=3000&maxPrice=20000&sortBy=creation_time_descend&exact=false');
+            await this.driver.get(search);
             await this.waitForPageToLoad();
             
             // Find all anchor elements with href starting with '/marketplace/item/'
@@ -55,13 +54,8 @@ export class Browser {
             });
             
             // Add new listings to the list
-            const new_listings = found_listings.filter((listing) => !this.listings.find((l) => l.id === listing.id));
+            const new_listings = found_listings.filter((listing) => !existingListings.includes(listing.id));
             
-            if (new_listings.length === 0) {
-                new_listings.push(found_listings[Math.floor(Math.random() * found_listings.length)]);
-            }
-            
-            this.listings.push(...new_listings);
             return new_listings;
         } catch (error) {
             console.error('Error getting listings:', error);
@@ -75,9 +69,15 @@ export class Browser {
             await this.driver.get(listing.url);
             await this.waitForPageToLoad();
 
-            // Click read more button
-            const readMoreButton = await this.driver.findElement(By.xpath('//span[text()="See more"]'));
+            // Click ignore button
+            const ignoreButton = await this.driver.findElement(By.css('[aria-label="Close"]'));
+            if (ignoreButton) {
+                await ignoreButton.click();
+            }
 
+            // Click read more button
+            const readMoreButton = await this.driver.findElement(By.xpath('//span[text()="See more"]/ancestor::*[@role="button"][1]'));
+            
             if (readMoreButton) {
                 await readMoreButton.click();
                 // Wait 1s
@@ -100,7 +100,7 @@ export class Browser {
             const price_matches = bodyText.match(priceRegex);
             
             // Get the kms if exists
-            const regex = /\b\d{1,3}(?:,\d{3})*\s?(km|kms|ks|k)\b/gi; // 'i' for case insensitive, 'g' for global
+            const regex = /\b\d{1,3}(?:[,. ]?(?:\d{3}|xxx))*\s?(km|kms|ks|k|klms)\b/gi; // 'i' for case insensitive, 'g' for global
             const km_matches = bodyText.match(regex);
             let kms = km_matches ? km_matches[0].trim() : 'Not found';
             if (kms === '64 km') {

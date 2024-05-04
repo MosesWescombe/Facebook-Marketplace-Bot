@@ -1,6 +1,7 @@
-import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
+import { Client, Collection, EmbedBuilder, Events, GatewayIntentBits } from 'discord.js';
 import path from 'path';
 import * as fs from 'fs'
+import { DetailedListing } from '../scraper/browser';
 
 export class CustomClient extends Client {
     public commands: Collection<string, any> = new Collection();
@@ -49,3 +50,29 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
+
+export const sendListingMessage = async (listing: DetailedListing, channelId: string) => {
+    const channel = client.channels.cache.get(channelId);
+
+    const embed = new EmbedBuilder()
+        .setTitle(listing.title)
+        .setURL(listing.url)
+        .setImage(listing.image)
+        .setTimestamp()
+        .addFields(
+            {
+                name: 'Price',
+                value: listing.price,
+                inline: true
+            },
+            {
+                name: 'Kms',
+                value: listing.kms,
+                inline: true
+            }
+        )
+
+    if (channel?.isTextBased()) {
+        await channel.send({embeds: [embed]});
+    }
+}

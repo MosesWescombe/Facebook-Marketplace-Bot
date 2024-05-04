@@ -2,3 +2,4 @@ node_modules
 .vscode
 dist
 src/bot/config.json
+data.json
