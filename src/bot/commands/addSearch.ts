@@ -1,7 +1,7 @@
-const { SlashCommandBuilder } = require("discord.js");
-const { dbManager } = require("../../db");
+import { dbManager } from "../../db";
+import { SlashCommandBuilder } from '@discordjs/builders';
 
-module.exports = {
+export const addSearch = {
 	data: new SlashCommandBuilder()
 		.setName('add-search')
 		.setDescription('Add an additional search to this channel. Usage: "/addSearch <search_url>"')
@@ -9,8 +9,7 @@ module.exports = {
             option.setName('url')
                 .setDescription('The URL to search')
                 .setRequired(true)),
-	// @ts-ignore
-	async execute(interaction) {
+	async execute(interaction: any) {
         const guildId = interaction.guildId;
         const channelId = interaction.channelId;
         const channel = interaction.channel;
@@ -34,3 +33,5 @@ module.exports = {
 		await interaction.reply(`Search added in ${channel.name} channel of ${guild.name} server.`);
 	},
 };
+
+export default {...addSearch}

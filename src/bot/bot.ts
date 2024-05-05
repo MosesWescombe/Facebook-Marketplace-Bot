@@ -18,10 +18,10 @@ client.once('ready', () => {
 const foldersPath = path.join(__dirname, 'commands');
 
 // const commandsPath = path.join(foldersPath, folder);
-const commandFiles = fs.readdirSync(foldersPath).filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync(foldersPath).filter(file => file.endsWith('.ts'));
 for (const file of commandFiles) {
     const filePath = path.join(foldersPath, file);
-    const command = require(filePath);
+    const command = require(filePath).default;
     // Set a new item in the Collection with the key as the command name and the value as the exported module
     if ('data' in command && 'execute' in command) {
         client.commands.set(command.data.name, command);

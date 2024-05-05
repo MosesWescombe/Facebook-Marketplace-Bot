@@ -69,19 +69,23 @@ export class Browser {
             await this.driver.get(listing.url);
             await this.waitForPageToLoad();
 
-            // Click ignore button
-            const ignoreButton = await this.driver.findElement(By.css('[aria-label="Close"]'));
-            if (ignoreButton) {
-                await ignoreButton.click();
-            }
+            try {
+                // Click ignore button
+                const ignoreButton = await this.driver.findElement(By.css('[aria-label="Close"]'));
+                if (ignoreButton) {
+                    await ignoreButton.click();
+                }
 
-            // Click read more button
-            const readMoreButton = await this.driver.findElement(By.xpath('//span[text()="See more"]/ancestor::*[@role="button"][1]'));
-            
-            if (readMoreButton) {
-                await readMoreButton.click();
-                // Wait 1s
-                await this.driver.sleep(1000);
+                // Click read more button
+                const readMoreButton = await this.driver.findElement(By.xpath('//span[text()="See more"]/ancestor::*[@role="button"][1]'));
+                
+                if (readMoreButton) {
+                    await readMoreButton.click();
+                    // Wait 1s
+                    await this.driver.sleep(1000);
+                }
+            } catch(e) {
+                console.log('No read more button found');
             }
             
             const titleElement = (await this.driver.getTitle());

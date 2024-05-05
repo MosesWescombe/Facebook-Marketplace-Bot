@@ -13,11 +13,11 @@ async function updateCommands(rest: REST, guildId: string) {
     const commands = [];
     // Grab all the command folders from the commands directory you created earlier
     const foldersPath = path.join(__dirname, './bot/commands');
-    const commandFiles = fs.readdirSync(foldersPath).filter(file => file.endsWith('.js'));
+    const commandFiles = fs.readdirSync(foldersPath).filter(file => file.endsWith('.ts'));
     // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
     for (const file of commandFiles) {
         const filePath = path.join(foldersPath, file);
-        const command = require(filePath);
+        const command = require(filePath).default;
         if ('data' in command && 'execute' in command) {
             commands.push(command.data.toJSON());
         } else {
@@ -78,6 +78,14 @@ class Runner {
 
         // Main thread
         while (true) {
+            // Pause if between 1am and 7am local time
+            const now = new Date();
+            const hour = now.getHours();
+            if (hour >= 1 && hour < 7) {
+                console.log("Sleeping for 1 hour...")
+                await new Promise(resolve => setTimeout(resolve, 3600000));
+            }
+
             const searchChannels = await dbManager.getSearchChannels();
 
             // Go through each channel
