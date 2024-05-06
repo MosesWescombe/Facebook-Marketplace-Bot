@@ -22,13 +22,11 @@ jobs:
         CLIENT_ID: ${{ secrets.CLIENT_ID }}
       run: |
         sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no -p 8022 root@$SSH_TARGET << 'EOF'
-          echo "Creating .env file..."
           rm -f ~/Facebook-Marketplace-Bot/.env || true
           cat > ~/Facebook-Marketplace-Bot/.env << 'ENV'
           DISCORD_TOKEN=${DISCORD_TOKEN}
           CLIENT_ID=${CLIENT_ID}
           ENV
-          echo ".env file created with sensitive data."
         EOF
 
     - name: SSH and Run Commands
