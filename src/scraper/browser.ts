@@ -87,33 +87,39 @@ export class Browser {
             } catch(e) {
                 console.log('No read more button found');
             }
-            // Find description element
-            const descriptionElement = await this.driver.findElement(By.css('[data-testid="marketplace_pdp_summary"]'));
-
-            // Get description text
-            const descriptionText = await descriptionElement.getText();
-
-            // Find seller name element
-            const sellerNameElement = await this.driver.findElement(By.css('[data-testid="marketplace_pdp_seller_name"]'));
-
-            // Get seller name
-            const sellerName = await sellerNameElement.getText();
-
+            
+            const titleElement = (await this.driver.getTitle());
+            const bodyText = await this.driver.findElement(By.css('body')).getText();
+            
+            // Title between the junk
+            let title: string;
+            if (titleElement.startsWith('Marketplace')) {
+                title = titleElement.split('–')[1]?.trim() || 'Title not found';
+            } else {
+                title = titleElement.split('–')[0]?.trim() || 'Title not found';
+            }
+            
+            // Regex to find the price format "NZ$ followed by numbers"
+            const priceRegex = /NZ\$\d{1,3}(?:[,.]\d{3})*(?:\.\d+)?/g;
+            const price_matches = bodyText.match(priceRegex);
+            
+            // Get the kms if exists
+            const regex = /\b\d{1,3}(?:[,. ]?(?:\d{3}|xxx))*\s?(km|kms|ks|k|klms)\b/gi; // 'i' for case insensitive, 'g' for global
+            const km_matches = bodyText.match(regex);
+            let kms = km_matches ? km_matches[0].trim() : 'Not found';
+            if (kms === '64 km') {
+                kms = 'Kms not found'
+            }
+            
+            // Find image
+            const images: WebElement[] = await this.driver.findElements(By.css('img[alt^="Product photo of"]'));
+            const img_src: string = await images[0]?.getAttribute('src') ?? 'Image not found';
+            
             return {
                 ...listing,
-                description: descriptionText,
-                seller: sellerName
-            };
-            // Find image element
-            const imageElement = await this.driver.findElement(By.css('[data-testid="marketplace_pdp_image"]'));
-
-            // Get image source
-            const img_src = await imageElement.getAttribute('src');
-
-            return {
-                ...listing,
-                description: descriptionText,
-                seller: sellerName,
+                title,
+                kms,
+                price: price_matches ? price_matches[0].trim() : 'Not found',
                 image: img_src
             };
         } catch (error) {
