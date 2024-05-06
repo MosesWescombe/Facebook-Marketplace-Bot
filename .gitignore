@@ -3,3 +3,7 @@ node_modules
 dist
 src/bot/config.json
 data.json
+.env
+
+volumes/**
+!.gitkeep

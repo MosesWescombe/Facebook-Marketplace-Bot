@@ -1,0 +1,10 @@
+volumes/
+dist/
+node_modules/
+.git/
+.vscode/
+nodemon.json
+.prettierrc
+.gitignore
+.dockerignore
+docker-compose.yml

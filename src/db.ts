@@ -1,4 +1,5 @@
-import { promises as fs } from 'fs';
+import * as fs from 'fs';
+import { promises as fsp } from 'fs';
 
 interface SearchChannel {
     name: string;
@@ -12,14 +13,21 @@ class SearchDbManager {
 
     constructor(filename: string) {
         // Create file if it doesn't exist
-        fs.readFile(filename, 'utf8').catch(() => {
-            fs.writeFile(filename, JSON.stringify({ searchChannels: [] }, null, 2), 'utf8');
-        });
+        try {
+            const file = fs.readFileSync(filename, 'utf8')
+            console.log("File: ", file)
+            if (!file || file === '') {
+                throw Error('Empty file');
+            }
+        } catch (error) {
+            fs.writeFileSync(filename, JSON.stringify({ searchChannels: [] }, null, 2), 'utf8');
+        }
+
         this.filename = filename;
     }
 
     async getSearchChannels(): Promise<SearchChannel[]> {
-        const data = await fs.readFile(this.filename, 'utf8');
+        const data = await fsp.readFile(this.filename, 'utf8');
         return JSON.parse(data).searchChannels;
     }
 
@@ -58,8 +66,8 @@ class SearchDbManager {
     }
 
     private async writeDatabase(channels: SearchChannel[]): Promise<void> {
-        await fs.writeFile(this.filename, JSON.stringify({ searchChannels: channels }, null, 2), 'utf8');
+        await fsp.writeFile(this.filename, JSON.stringify({ searchChannels: channels }, null, 2), 'utf8');
     }
 }
 
-export const dbManager = new SearchDbManager('./data.json');
+export const dbManager = new SearchDbManager('./volumes/data.json');

@@ -4,7 +4,7 @@ import { dbManager } from "./db";
 import { Browser, DetailedListing, Listing } from "./scraper/browser";
 import path from "path";
 import * as fs from 'fs';
-const config = require('./bot/config.json');
+import { config } from "./constants";
 
 const searchChannelListings = new Map<string, string[]>();
 const fetchedSearches: string[] = [];

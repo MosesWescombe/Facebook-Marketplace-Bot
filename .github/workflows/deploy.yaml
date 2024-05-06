@@ -1,0 +1,46 @@
+name: Deploy to Server
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install sshpass
+      run: sudo apt-get install -y sshpass
+
+    - name: SSH and Create env file
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_TARGET: ${{ secrets.SSH_TARGET }}
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      run: |
+        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no root@$SSH_TARGET << 'EOF'
+          echo "Creating .env file..."
+          rm -f ~/Facebook-Marketplace-Bot/.env || true
+          cat > ~/Facebook-Marketplace-Bot/.env << 'ENV'
+          DISCORD_TOKEN=${DISCORD_TOKEN}
+          CLIENT_ID=${CLIENT_ID}
+          ENV
+          echo ".env file created with sensitive data."
+        EOF
+
+    - name: SSH and Run Commands
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SSH_TARGET: ${{ secrets.SSH_TARGET }}
+      run: |
+        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no root@$SSH_TARGET << 'EOF'
+          echo "Running commands on the server..."
+          cd ~/Facebook-Marketplace-Bot
+          git pull
+          docker compose down
+          docker image rm scraper-bot-1 || true 
+          docker compose -p scraper up -d
+        EOF

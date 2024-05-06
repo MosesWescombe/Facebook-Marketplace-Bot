@@ -1,37 +1,39 @@
 {
-  "name": "facebook-marketplace-bot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "prettier": ".prettierrc",
-  "scripts": {
-    "build": "tsc",
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon",
-    "prod": "tsc && node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MosesWescombe/Facebook-Marketplace-Bot.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/MosesWescombe/Facebook-Marketplace-Bot/issues"
-  },
-  "homepage": "https://github.com/MosesWescombe/Facebook-Marketplace-Bot#readme",
-  "devDependencies": {
-    "@types/node": "^20.12.8",
-    "@types/selenium-webdriver": "^4.1.22",
-    "nodemon": "^3.1.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "prettier": "^3.2.5",
-    "selenium-webdriver": "^4.20.0",
-    "discord.js": "^14.14.1"
-  }
+    "name": "facebook-marketplace-bot",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "prettier": ".prettierrc",
+    "scripts": {
+        "build": "tsc --outDir dist && cp ./data.json ./dist/data.json",
+        "build:prod": "tsc",
+        "start": "ts-node src/index.ts",
+        "dev": "nodemon",
+        "prod": "node src/index.js",
+        "clean": "rm -rf dist",
+        "docker:clear": "docker compose down && docker image rm scraper-bot-1",
+        "docker:run": "docker compose -p scraper up -d",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/MosesWescombe/Facebook-Marketplace-Bot.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "homepage": "https://github.com/MosesWescombe/Facebook-Marketplace-Bot#readme",
+    "devDependencies": {
+        "@types/node": "^20.12.8",
+        "@types/selenium-webdriver": "^4.1.22",
+        "nodemon": "^3.1.0",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.5"
+    },
+    "dependencies": {
+        "discord.js": "^14.14.1",
+        "dotenv": "^16.4.5",
+        "prettier": "^3.2.5",
+        "selenium-webdriver": "^4.20.0"
+    }
 }
