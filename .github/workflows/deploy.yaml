@@ -21,7 +21,7 @@ jobs:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         CLIENT_ID: ${{ secrets.CLIENT_ID }}
       run: |
-        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no root@$SSH_TARGET << 'EOF'
+        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no -p 8022 root@$SSH_TARGET << 'EOF'
           echo "Creating .env file..."
           rm -f ~/Facebook-Marketplace-Bot/.env || true
           cat > ~/Facebook-Marketplace-Bot/.env << 'ENV'
@@ -36,7 +36,7 @@ jobs:
         SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         SSH_TARGET: ${{ secrets.SSH_TARGET }}
       run: |
-        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no root@$SSH_TARGET << 'EOF'
+        sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no -p 8022 root@$SSH_TARGET << 'EOF'
           echo "Running commands on the server..."
           cd ~/Facebook-Marketplace-Bot
           git pull
