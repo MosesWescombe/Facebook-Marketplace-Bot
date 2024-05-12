@@ -126,9 +126,9 @@ export class Browser {
             // Add new listings to the list
             const new_listings = found_listings.filter((listing) => !existingListings.includes(listing.id));
             
-            if (new_listings.length > 1) {
-                return [found_listings[1]];
-            }
+            // if (new_listings.length > 1) {
+            //     return [found_listings[1]];
+            // }
 
             return new_listings;
         } catch (error) {

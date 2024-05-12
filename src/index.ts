@@ -97,9 +97,6 @@ class Runner {
                     if (!fetchedSearches.includes(search)) {
                         const existing_listings = await this.browser.getListings(search, []);
                         searchChannelListings.set(channel.channelId, [...searchChannelListings.get(channel.channelId) || [], ...existing_listings.map(listing => listing.id)]);
-                        console.log(existing_listings.length)
-                        const details = await this.browser.getDetails(existing_listings[0]);
-                        console.log(details)
                         fetchedSearches.push(search);
                     }
 
