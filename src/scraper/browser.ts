@@ -74,10 +74,10 @@ export class Browser {
 
     constructor() {
         // Headless mode
-        // this.driver = new Builder().setChromeOptions(new Options().addArguments('--headless=new', '--no-sandbox', '--disable-dev-shm-usage')).build();
+        this.driver = new Builder().setChromeOptions(new Options().addArguments('--headless=new', '--no-sandbox', '--disable-dev-shm-usage')).build();
 
         // Non-headless mode
-        this.driver = new Builder().forBrowser('chrome').build();
+        // this.driver = new Builder().forBrowser('chrome').build();
     }
 
     closeLoginPopup = async () => {
