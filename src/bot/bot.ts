@@ -72,6 +72,34 @@ export const sendListingMessage = async (listing: DetailedListing, channelId: st
             }
         )
 
+    if (listing.price_details) {
+        embed.addFields(
+            {
+                name: 'Value Low',
+                value: listing.price_details.low.toString() ?? 'N/A',
+                inline: true
+            },
+            {
+                name: 'Value Avg',
+                value: listing.price_details.average.toString() ?? 'N/A',
+                inline: true
+            },
+            {
+                name: 'Value High',
+                value: listing.price_details.high.toString() ?? 'N/A',
+                inline: true
+            }
+        )
+    }
+
+    if (listing.plate) {
+        embed.addFields({
+            name: 'Plate',
+            value: listing.plate,
+            inline: false
+        });
+    }
+
     if (channel?.isTextBased()) {
         await channel.send({embeds: [embed]});
     }

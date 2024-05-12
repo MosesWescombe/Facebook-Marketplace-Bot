@@ -78,9 +78,9 @@ class Runner {
 
         // Main thread
         while (true) {
-            // Pause if between 1am and 7am local time
-            const now = new Date();
-            const hour = now.getHours();
+            // Pause if between 1am and 7am NZ time
+            const date = new Date();
+            const hour = parseInt(date.toLocaleTimeString('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', hour12: false, }));
             if (hour >= 1 && hour < 7) {
                 console.log("Sleeping for 1 hour...")
                 await new Promise(resolve => setTimeout(resolve, 3600000));
@@ -97,6 +97,9 @@ class Runner {
                     if (!fetchedSearches.includes(search)) {
                         const existing_listings = await this.browser.getListings(search, []);
                         searchChannelListings.set(channel.channelId, [...searchChannelListings.get(channel.channelId) || [], ...existing_listings.map(listing => listing.id)]);
+                        console.log(existing_listings.length)
+                        const details = await this.browser.getDetails(existing_listings[0]);
+                        console.log(details)
                         fetchedSearches.push(search);
                     }
 

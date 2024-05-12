@@ -20,12 +20,14 @@ jobs:
         SSH_TARGET: ${{ secrets.SSH_TARGET }}
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        PLATE_RECOGNIZER_TOKEN: ${{ secrets.PLATE_RECOGNIZER_TOKEN }}
       run: |
         sshpass -p $SSH_PASSWORD ssh -o StrictHostKeyChecking=no -p 8022 root@$SSH_TARGET << EOF
         rm -f ~/Facebook-Marketplace-Bot/.env || true
         cat > ~/Facebook-Marketplace-Bot/.env << ENV
         DISCORD_TOKEN=$DISCORD_TOKEN
         CLIENT_ID=$CLIENT_ID
+        PLATE_RECOGNIZER_TOKEN=$PLATE_RECOGNIZER_TOKEN
         EOF
 
     - name: SSH and Run Commands
