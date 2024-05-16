@@ -52,55 +52,62 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 export const sendListingMessage = async (listing: DetailedListing, channelId: string) => {
-    const channel = client.channels.cache.get(channelId);
+    try {
+        const channel = client.channels.cache.get(channelId);
 
-    const embed = new EmbedBuilder()
-        .setTitle(listing.title)
-        .setURL(listing.url)
-        .setImage(listing.image)
-        .setTimestamp()
-        .addFields(
-            {
-                name: 'Price',
-                value: listing.price,
-                inline: true
-            },
-            {
-                name: 'Kms',
-                value: listing.kms,
-                inline: true
-            }
-        )
+        const embed = new EmbedBuilder()
+            .setTitle(listing.title)
+            .setURL(listing.url)
+            .setTimestamp()
+            .addFields(
+                {
+                    name: 'Price',
+                    value: listing.price,
+                    inline: true
+                },
+                {
+                    name: 'Kms',
+                    value: listing.kms,
+                    inline: true
+                }
+            )
 
-    if (listing.price_details) {
-        embed.addFields(
-            {
-                name: 'Value Low',
-                value: listing.price_details.low.toString() ?? 'N/A',
-                inline: true
-            },
-            {
-                name: 'Value Avg',
-                value: listing.price_details.average.toString() ?? 'N/A',
-                inline: true
-            },
-            {
-                name: 'Value High',
-                value: listing.price_details.high.toString() ?? 'N/A',
-                inline: true
-            }
-        )
-    }
+        if (listing.image !== 'No image found') {
+            embed.setImage(listing.image);
+        }
 
-    if (listing.plate) {
-        embed.addFields({
-            name: 'Plate',
-            value: listing.plate,
-            inline: false
-        });
-    }
+        if (listing.price_details) {
+            embed.addFields(
+                {
+                    name: 'Value Low',
+                    value: listing.price_details.low.toString() ?? 'N/A',
+                    inline: true
+                },
+                {
+                    name: 'Value Avg',
+                    value: listing.price_details.average.toString() ?? 'N/A',
+                    inline: true
+                },
+                {
+                    name: 'Value High',
+                    value: listing.price_details.high.toString() ?? 'N/A',
+                    inline: true
+                }
+            )
+        }
 
-    if (channel?.isTextBased()) {
-        await channel.send({embeds: [embed]});
+        if (listing.plate) {
+            embed.addFields({
+                name: 'Plate',
+                value: listing.plate,
+                inline: false
+            });
+        }
+
+        if (channel?.isTextBased()) {
+            await channel.send({embeds: [embed]});
+        }
+    } catch (e) {
+        console.log("Failed to send message", e)
     }
 }

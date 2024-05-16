@@ -78,51 +78,55 @@ class Runner {
 
         // Main thread
         while (true) {
-            // Pause if between 1am and 7am NZ time
-            const date = new Date();
-            const hour = parseInt(date.toLocaleTimeString('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', hour12: false, }));
-            if (hour >= 1 && hour < 7) {
-                console.log("Sleeping for 1 hour...")
-                await new Promise(resolve => setTimeout(resolve, 3600000));
-            }
+            try {
+                // Pause if between 1am and 7am NZ time
+                const date = new Date();
+                const hour = parseInt(date.toLocaleTimeString('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', hour12: false, }));
+                if (hour >= 1 && hour < 7) {
+                    console.log("Sleeping for 1 hour...")
+                    await new Promise(resolve => setTimeout(resolve, 3600000));
+                }
 
-            const searchChannels = await dbManager.getSearchChannels();
+                const searchChannels = await dbManager.getSearchChannels();
 
-            // Go through each channel
-            for (const channel of searchChannels) {
-                // Get all new listings
-                const new_listings: Listing[] = [];
-                for (const search of channel.searches) {
-                    // Do initial fetch for any new searches
-                    if (!fetchedSearches.includes(search)) {
-                        const existing_listings = await this.browser.getListings(search, []);
-                        searchChannelListings.set(channel.channelId, [...searchChannelListings.get(channel.channelId) || [], ...existing_listings.map(listing => listing.id)]);
-                        fetchedSearches.push(search);
+                // Go through each channel
+                for (const channel of searchChannels) {
+                    // Get all new listings
+                    const new_listings: Listing[] = [];
+                    for (const search of channel.searches) {
+                        // Do initial fetch for any new searches
+                        if (!fetchedSearches.includes(search)) {
+                            const existing_listings = await this.browser.getListings(search, []);
+                            searchChannelListings.set(channel.channelId, [...searchChannelListings.get(channel.channelId) || [], ...existing_listings.map(listing => listing.id)]);
+                            fetchedSearches.push(search);
+                        }
+
+                        // Fetch new listings
+                        const existing_listings = searchChannelListings.get(channel.channelId) || [];
+                        new_listings.push(...await this.browser.getListings(search, existing_listings));
+                        searchChannelListings.set(channel.channelId, [...existing_listings, ...new_listings.map(listing => listing.id)]);
                     }
 
-                    // Fetch new listings
-                    const existing_listings = searchChannelListings.get(channel.channelId) || [];
-                    new_listings.push(...await this.browser.getListings(search, existing_listings));
-                    searchChannelListings.set(channel.channelId, [...existing_listings, ...new_listings.map(listing => listing.id)]);
-                }
+                    // Get details
+                    const detailed_listings: DetailedListing[] = []
+                    for (const listing of new_listings) {
+                        const details = await this.browser.getDetails(listing);
+                        details && detailed_listings.push(details);
+                    }
 
-                // Get details
-                const detailed_listings: DetailedListing[] = []
-                for (const listing of new_listings) {
-                    const details = await this.browser.getDetails(listing);
-                    details && detailed_listings.push(details);
-                }
+                    if (detailed_listings.length > 0) {
+                        console.log(`New Listings ${detailed_listings.length}`)
+                    }
 
-                if (detailed_listings.length > 0) {
-                    console.log(`New Listings ${detailed_listings.length}`)
-                }
+                    for (const listing of detailed_listings) {
+                        await sendListingMessage(listing, channel.channelId)
+                    }
 
-                for (const listing of detailed_listings) {
-                    await sendListingMessage(listing, channel.channelId)
+                    const randomDelay = Math.floor(Math.random() * 20000) + 35000; // Generate a random delay between 15-25 seconds (in milliseconds)
+                    await new Promise(resolve => setTimeout(resolve, randomDelay));
                 }
-
-                const randomDelay = Math.floor(Math.random() * 20000) + 35000; // Generate a random delay between 15-25 seconds (in milliseconds)
-                await new Promise(resolve => setTimeout(resolve, randomDelay));
+            } catch (error) {
+                console.error('Error:', error);
             }
         }
     }
